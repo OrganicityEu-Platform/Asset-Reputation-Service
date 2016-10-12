@@ -1,0 +1,6 @@
+db.apiLogEntry.aggregate(...)
+Count Hits per Asset
+{$group:{"_id" :  "$asset","count" : {"$sum" : 1 }}}
+
+Count Distinct Ips per Asset
+db.apiLogEntry.aggregate( {$group: {"_id" :  {asset:"$asset",ip:"$ip"} , data: {   $addToSet : 1 } }}, {$group: {"_id" : "$_id.asset", "count" :{$sum:1} }} )

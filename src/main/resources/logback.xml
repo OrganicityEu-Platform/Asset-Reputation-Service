@@ -1,0 +1,41 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE1" class="ch.qos.logback.core.FileAppender">
+        <file>debug.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <param name="Append" value="false" />
+    </appender>
+
+    <appender name="FILE2" class="ch.qos.logback.core.FileAppender">
+        <file>info.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <param name="Append" value="false" />
+    </appender>
+
+
+    <logger name="org.hibernate.type" level="ERROR"/>
+    <logger name="org.hibernate.SQL" level="ERROR"/>
+    <logger name="org.eclipse.persistence" level="ERROR"/>
+    <logger name="org.springframework.jdbc" level="ERROR"/>
+    <logger name="org.springframework.data.jpa" level="ERROR"/>
+    <logger name="org.springframework.dao" level="ERROR"/>
+    <logger name="org.springframework.orm" level="ERROR"/>
+    <logger name="logging.level.org.springframework.web" level="ALL"/>
+    <root level="INFO"> <!-- ERROR, ALL, INFO, WARN-->
+        <appender-ref ref="FILE2"/>
+    </root>
+    <root level="DEBUG"> <!-- ERROR, ALL, INFO, WARN-->
+        <appender-ref ref="FILE1"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
