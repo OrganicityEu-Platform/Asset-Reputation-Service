@@ -12,10 +12,18 @@ import java.util.HashMap;
 public class Memory {
 
     HashMap<String, HashMap<String, Double>> statistics = new HashMap<>();
+    int counter=0;
 
+    public  void clear() {
+        statistics.clear(); counter=0;
+    }
 
-    void clear() {
-        statistics.clear();
+    public  void updated() {
+        counter++;
+    }
+
+    public  int getUpdated() {
+        return counter;
     }
 
     void pushStatistic(String asset, String statName, Double statValue) {

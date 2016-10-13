@@ -1,6 +1,7 @@
 package mongo;
 
 import com.mongodb.*;
+import operations.BatchOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.ChunkListener;
@@ -70,7 +71,7 @@ public class OrionItemWriter implements ItemWriter<Object>, InitializingBean, Ch
             try {
                // WriteResult wr = mongo.getDB(db).getCollection(collection).update(inputObject, command, true, true, WriteConcern.NORMAL);
                 WriteResult wr = mongo.getDB(db).getCollection(collection).save(inputObject);
-
+                BatchOperation.memory.updated();
                 LOG.info("Reputation Update" + inputObject.get("_id").toString() + "  Value:" + rep);
             } catch (MongoServerException e) {
                 throw new MongoDBInsertFailedException(db, collection, e.getMessage());

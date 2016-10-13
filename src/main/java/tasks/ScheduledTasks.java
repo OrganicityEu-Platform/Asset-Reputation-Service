@@ -1,6 +1,7 @@
 package tasks;
 
 import operations.BatchOperation;
+import operations.Memory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.*;
@@ -31,11 +32,13 @@ public class ScheduledTasks {
     @Qualifier("reputationJob")
     Job job;
 
-    @Scheduled( fixedDelay = 600000,initialDelay = 600000)
+    @Scheduled( fixedDelay = 300000,initialDelay = 300000)
     public void reportCurrentTime() {
         LOG.info("Reputation Job Started:");
          try {
+            BatchOperation.memory.clear();
             JobExecution je = jobLauncher.run(job, param);
+             LOG.info("Updated:"+BatchOperation.memory.getUpdated());
             LOG.info("Job Execution:" + je.getStatus().toString());
             LOG.info("Reputation Job Ended Succesfully:");
         } catch (JobExecutionAlreadyRunningException e) {

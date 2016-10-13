@@ -11,10 +11,14 @@ public class TotalAssetCountConverter implements Converter<DBObject, Statistic> 
     @Override
     public Statistic convert(DBObject item) {
         Statistic entry = new Statistic();
-        entry.setAsset(item.get("_id").toString());
-        entry.setStatName("AssetAccessCount");
-        entry.setStatValue(Double.valueOf(item.get("count").toString()));
-        LOG.info(entry.getAsset() + "," + entry.getStatName() + "," + entry.getStatValue());
-        return entry;
+       try {
+           entry.setAsset(item.get("_id").toString());
+           entry.setStatName("AssetAccessCount");
+           entry.setStatValue(Double.valueOf(item.get("count").toString()));
+           LOG.info(entry.getAsset() + "," + entry.getStatName() + "," + entry.getStatValue());
+       } catch(Exception e){
+           LOG.debug(item.toString());
+       }
+           return entry;
     }
 }
