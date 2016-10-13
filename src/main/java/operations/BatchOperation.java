@@ -35,14 +35,22 @@ public class BatchOperation {
     @Value("${mongodbhost}")
     private String mongodbhost;
 
-    @Bean(name = "reputationJob")
+  /*  @Bean(name = "reputationJob")
     public Job getJob() {
         return jobBuilderFactory.get("reputationJob")
                 .incrementer(new RunIdIncrementer())
                 .start(step2()).on("*").to(step3())
                 .build().build();
     }
+*/
 
+    @Bean(name = "reputationJob")
+    public Job calculateModel() {
+        return jobBuilderFactory.get("reputationJob")
+                .incrementer(new RunIdIncrementer())
+                .start(step2()).on("*").to(step3()).on("*").to(step4())
+                .build().build();
+    }
     // Calculation of total count of requests for each asset
     @Bean(name = "step2")
     public Step step2() {
@@ -63,14 +71,6 @@ public class BatchOperation {
                 .processor(new FuseStatisticObjectToDBObject()) //fuse all statistics from the shared memory to a db object for inserting to mongo
                 .writer(new MongoDBItemWriter(mongodbhost, mongodbport, "apilog", "assetStatistics"))
                 .build();
-    }
-
-    @Bean(name = "calculateModelJob")
-    public Job calculateModel() {
-        return jobBuilderFactory.get("calculateModel")
-                .incrementer(new RunIdIncrementer())
-                .start(step2()).on("*").to(step3()).on("*").to(step4())
-                .build().build();
     }
 
     //Calculate from statistics thet reputation score(iterate all objects from a select on database)

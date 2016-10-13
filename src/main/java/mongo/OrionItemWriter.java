@@ -51,6 +51,7 @@ public class OrionItemWriter implements ItemWriter<Object>, InitializingBean, Ch
             if (r!=null && r.get("value") != null) {
                 Double value = (Double) r.get("value");
                 if (value.equals(rep))
+                    LOG.info("Reputation No Update: " + ((BasicDBObject)inputObject.get("_id")).get("id").toString() + "  Value:" + rep);
                     continue;
             }
 

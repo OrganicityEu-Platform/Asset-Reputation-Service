@@ -134,7 +134,7 @@ public class MongoDBItemReader
         if (itemIndex < 0) {
             throw new IllegalArgumentException("Index must not be negative: " + itemIndex);
         }
-        if (cursor!=null) cursor.skip(itemIndex + skip);
+        if (cursor != null) cursor.skip(itemIndex + skip);
     }
 
     @Override
@@ -173,12 +173,18 @@ public class MongoDBItemReader
 
     @Override
     public Object doRead() throws Exception {
-        if (cursor2 ==null && cursor==null) doOpen();
+        if (cursor2 == null && cursor == null) doOpen();
         try {
             if (cursor2 != null) {
-                return converter != null ? converter.convert(cursor2.next()) : cursor2.next();
+                if (cursor2.hasNext())
+                    return converter != null ? converter.convert(cursor2.next()) : cursor2.next();
+                else
+                    return null;
             }
-            return converter != null ? converter.convert(cursor.next()) : cursor.next();
+            if (cursor.hasNext())
+                return converter != null ? converter.convert(cursor.next()) : cursor.next();
+            else
+                return null;
         } catch (RuntimeException e) {
             if (NO_MORE.equals(e.getMessage())) {
                 return null;
@@ -198,7 +204,7 @@ public class MongoDBItemReader
             cursor.close();
         }
         if (cursor2 != null) {
-            cursor2=null;
+            cursor2 = null;
         }
     }
 

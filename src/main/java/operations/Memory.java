@@ -12,17 +12,18 @@ import java.util.HashMap;
 public class Memory {
 
     HashMap<String, HashMap<String, Double>> statistics = new HashMap<>();
-    int counter=0;
+    int counter = 0;
 
-    public  void clear() {
-        statistics.clear(); counter=0;
+    public void clear() {
+        statistics.clear();
+        counter = 0;
     }
 
-    public  void updated() {
+    public void updated() {
         counter++;
     }
 
-    public  int getUpdated() {
+    public int getUpdated() {
         return counter;
     }
 
@@ -47,15 +48,19 @@ public class Memory {
         }
         return statistics.get(asset);
     }
-    DBObject getStatisticsDBObject(String asset) throws Exception {
-        DBObject object=new BasicDBObject();
 
-        HashMap<String, Double> h=statistics.get(asset);
-        if (h==null) throw new Exception("No Statistics for this asset");
-        object.put("_id",asset);
-        for(String stat : h.keySet()){
-            object.put(stat,h.get(stat));
-        }
+    DBObject getStatisticsDBObject(String asset) throws Exception {
+        DBObject object = new BasicDBObject();
+
+        HashMap<String, Double> h = statistics.get(asset);
+        if (asset == null)
+            object.put("_id", "null");
+        else
+            object.put("_id", asset);
+        if (h != null)
+            for (String stat : h.keySet()) {
+                object.put(stat, h.get(stat));
+            }
         return object;
     }
 }

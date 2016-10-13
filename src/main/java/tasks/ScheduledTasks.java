@@ -9,6 +9,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,14 +33,20 @@ public class ScheduledTasks {
     @Qualifier("reputationJob")
     Job job;
 
-    @Scheduled( fixedDelay = 300000,initialDelay = 300000)
-    public void reportCurrentTime() {
+    @Autowired
+    JobRepository jobRepository;
+
+    @Scheduled(fixedDelay = 300000, initialDelay = 100000)
+    public void reportCurrentTime() throws JobParametersInvalidException {
+
         LOG.info("Reputation Job Started:");
-         try {
+        try {
             BatchOperation.memory.clear();
-            JobExecution je = jobLauncher.run(job, param);
-             LOG.info("Updated:"+BatchOperation.memory.getUpdated());
-            LOG.info("Job Execution:" + je.getStatus().toString());
+
+            //JobExecution jobExecution = jobRepository.getLastJobExecution("reputationJob", param);
+            JobExecution jobExecution =jobLauncher.run(job, param);
+            LOG.info("Updated:" + BatchOperation.memory.getUpdated());
+            LOG.info("Job Execution:" + jobExecution.getStatus().toString());
             LOG.info("Reputation Job Ended Succesfully:");
         } catch (JobExecutionAlreadyRunningException e) {
             LOG.info("JobExecutionAlreadyRunningException:");
@@ -49,9 +56,6 @@ public class ScheduledTasks {
             e.printStackTrace();
         } catch (JobInstanceAlreadyCompleteException e) {
             LOG.info("JobInstanceAlreadyCompleteException:");
-            e.printStackTrace();
-        } catch (JobParametersInvalidException e) {
-            LOG.info("JobParametersInvalidException:");
             e.printStackTrace();
         }
     }
