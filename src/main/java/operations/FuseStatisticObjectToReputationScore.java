@@ -3,11 +3,15 @@ package operations;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import domain.AssetIPCountConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 
 import java.util.HashMap;
 
 public class FuseStatisticObjectToReputationScore implements ItemProcessor<Object, Object> {
+    private static final Logger LOG = LoggerFactory.getLogger(AssetIPCountConverter.class);
     @Override
     public Object process(Object item) throws Exception {
         DBObject item2 = (DBObject) item;
@@ -24,6 +28,7 @@ public class FuseStatisticObjectToReputationScore implements ItemProcessor<Objec
         }
         item2.put("Reputation", reputation);
         item2.put("ReputationTime", System.currentTimeMillis()/1000);
+        LOG.info(asset + ", Score:" + reputation);
         return item2;
     }
 }

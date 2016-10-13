@@ -33,27 +33,27 @@ public class OrionItemWriter implements ItemWriter<Object>, InitializingBean, Ch
     public void write(List<? extends Object> items) throws Exception {
 
         for (Object o : items) {
-            DBObject dbo = (DBObject) o;
-            Double rep = (Double) dbo.get("Reputation");
-            Long repTime = (Long) dbo.get("ReputationTime");
+            DBObject inputObject = (DBObject) o;
+            Double rep = (Double) inputObject.get("Reputation");
+            Long repTime = (Long) inputObject.get("ReputationTime");
 
-            BasicDBObject query = new BasicDBObject();
-            query.append("_id", dbo.get("_id"));
-            BasicDBObject update = new BasicDBObject();
-            update.append("_id", dbo.get("_id"));
-            BasicDBList att = (BasicDBList) dbo.get("attrNames");
+
+           // BasicDBObject updatedObject = new BasicDBObject();
+           // updatedObject.append("_id", inputObject.get("_id"));
+            BasicDBList att = (BasicDBList) inputObject.get("attrNames");
             if (att.indexOf("reputation") == -1) {
                 att.add("reputation");
-                update.append("attrNames", att);
+               // updatedObject.append("attrNames", att);
             }
-            BasicDBObject att2 = (BasicDBObject) dbo.get("attrs");
+            BasicDBObject att2 = (BasicDBObject) inputObject.get("attrs");
             BasicDBObject r = (BasicDBObject) att2.get("reputation");
-            BasicDBObject repAttr = new BasicDBObject();
-            if (r.get("value") != null) {
+            if (r!=null && r.get("value") != null) {
                 Double value = (Double) r.get("value");
                 if (value.equals(rep))
                     continue;
             }
+
+            BasicDBObject repAttr = new BasicDBObject();
             if (r != null) {
                 repAttr.put("creDate", r.get("creDate"));
             } else {
@@ -63,12 +63,15 @@ public class OrionItemWriter implements ItemWriter<Object>, InitializingBean, Ch
             repAttr.put("value", (rep == null) ? -1 : rep);
             repAttr.put("type", "urn:oc:attributeType:reputation");
             repAttr.put("modDate", repTime);
-            update.append("attrs.reputation", repAttr);
+            att2.append("reputation", repAttr);
+            //inputObject.append("attrs.reputation", repAttr);
             BasicDBObject command = new BasicDBObject();
-            command.put("$set", update);
+            command.put("$set", inputObject);
             try {
-                WriteResult wr = mongo.getDB(db).getCollection(collection).update(query, command, false, false, WriteConcern.SAFE);
-                LOG.debug("Reputation Update" + dbo.get("_id").toString() + "  Value:" + rep);
+               // WriteResult wr = mongo.getDB(db).getCollection(collection).update(inputObject, command, true, true, WriteConcern.NORMAL);
+                WriteResult wr = mongo.getDB(db).getCollection(collection).save(inputObject);
+
+                LOG.info("Reputation Update" + inputObject.get("_id").toString() + "  Value:" + rep);
             } catch (MongoServerException e) {
                 throw new MongoDBInsertFailedException(db, collection, e.getMessage());
             }

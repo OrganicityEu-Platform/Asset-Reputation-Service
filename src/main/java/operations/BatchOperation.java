@@ -43,22 +43,24 @@ public class BatchOperation {
                 .build().build();
     }
 
+    // Calculation of total count of requests for each asset
     @Bean(name = "step2")
     public Step step2() {
         return stepBuilderFactory.get("step2")
                 .chunk(1)
                 .reader(new MongoDBItemReader(mongodbhost, mongodbport, "apilog", "apiLogEntry", new TotalAssetCountConverter(), null, "{$group:{\"_id\" :  \"$asset\",\"count\" : {\"$sum\" : 1 }}}", null))
-                .processor(new FuseStatisticObject())
+                .processor(new FuseStatisticObject()) //fuse stat in the shared memory object
                 //.writer(new ConsoleItemWriter<>())
                 .build();
     }
 
+    // Calculation of total IPs for each asset
     @Bean(name = "step3")
     public Step step3() {
         return stepBuilderFactory.get("step3")
                 .chunk(1)
                 .reader(new MongoDBItemReader(mongodbhost, mongodbport, "apilog", "apiLogEntry", new AssetIPCountConverter(), null, "{$group: {\"_id\" :  {asset:\"$asset\",ip:\"$ip\"} , data: {   $addToSet : 1 } }}", "{$group: {\"_id\" : \"$_id.asset\", \"count\" :{$sum:1} }}"))
-                .processor(new FuseStatisticObjectToDBObject())
+                .processor(new FuseStatisticObjectToDBObject()) //fuse all statistics from the shared memory to a db object for inserting to mongo
                 .writer(new MongoDBItemWriter(mongodbhost, mongodbport, "apilog", "assetStatistics"))
                 .build();
     }
@@ -71,13 +73,14 @@ public class BatchOperation {
                 .build().build();
     }
 
+    //Calculate from statistics thet reputation score(iterate all objects from a select on database)
     @Bean(name = "step4")
     public Step step4() {
         return stepBuilderFactory.get("step4")
                 .chunk(10)
-                .reader(new MongoDBItemReader(mongodbhost, mongodbport, "orion", "entities", null, "{},{\"_id.id\":1}", null, null))
+                .reader(new MongoDBItemReader(mongodbhost, mongodbport, "orion-organicity", "entities", null, "{},{\"_id.id\":1}", null, null))
                 .processor(new FuseStatisticObjectToReputationScore())
-                .writer(new OrionItemWriter(mongodbhost, mongodbport, "orion", "entities")).listener(new JobListener())
+                .writer(new OrionItemWriter(mongodbhost, mongodbport, "orion-organicity", "entities")).listener(new JobListener())
                 .build();
     }
 

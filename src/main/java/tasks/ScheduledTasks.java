@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * Created by etheodor on 16/06/2016.
  */
 
-//@Component
+@Component
 public class ScheduledTasks {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledTasks.class);
@@ -31,7 +31,7 @@ public class ScheduledTasks {
     @Qualifier("reputationJob")
     Job job;
 
-    @Scheduled( fixedDelay = 30000,initialDelay = 120000)
+    @Scheduled( fixedDelay = 600000,initialDelay = 600000)
     public void reportCurrentTime() {
         LOG.info("Reputation Job Started:");
          try {

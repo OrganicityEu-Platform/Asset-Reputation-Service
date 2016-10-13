@@ -34,7 +34,7 @@
     <root level="INFO"> <!-- ERROR, ALL, INFO, WARN-->
         <appender-ref ref="FILE2"/>
     </root>
-    <root level="DEBUG"> <!-- ERROR, ALL, INFO, WARN-->
+    <root level="INFO"> <!-- ERROR, ALL, INFO, WARN-->
         <appender-ref ref="FILE1"/>
         <appender-ref ref="STDOUT"/>
     </root>
