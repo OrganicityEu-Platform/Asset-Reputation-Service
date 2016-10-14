@@ -1,6 +1,7 @@
 package tasks;
 
 import operations.BatchOperation;
+import operations.JobIncrementer;
 import operations.Memory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class ScheduledTasks {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledTasks.class);
-    JobParameters param = new JobParametersBuilder().toJobParameters();
+    JobParameters param =  new JobParametersBuilder().addLong("run.id", 2L).toJobParameters();
 
     @Autowired
     private JobLauncher jobLauncher;
@@ -36,18 +37,20 @@ public class ScheduledTasks {
     @Autowired
     JobRepository jobRepository;
 
-    @Scheduled(fixedDelay = 300000, initialDelay = 100000)
+
+
+    @Scheduled(fixedDelay = 300000, initialDelay = 300000)
     public void reportCurrentTime() throws JobParametersInvalidException {
 
         LOG.info("Reputation Job Started:");
         try {
             BatchOperation.memory.clear();
-
             //JobExecution jobExecution = jobRepository.getLastJobExecution("reputationJob", param);
             JobExecution jobExecution =jobLauncher.run(job, param);
             LOG.info("Updated:" + BatchOperation.memory.getUpdated());
             LOG.info("Job Execution:" + jobExecution.getStatus().toString());
             LOG.info("Reputation Job Ended Succesfully:");
+            param=(new JobIncrementer()).getNext(jobExecution.getJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
             LOG.info("JobExecutionAlreadyRunningException:");
             e.printStackTrace();

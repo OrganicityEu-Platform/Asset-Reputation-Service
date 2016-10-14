@@ -46,10 +46,11 @@ public class BatchOperation {
 
     @Bean(name = "reputationJob")
     public Job calculateModel() {
-        return jobBuilderFactory.get("reputationJob")
-                .incrementer(new RunIdIncrementer())
+        Job j=jobBuilderFactory.get("reputationJob")
+                .incrementer(new JobIncrementer())
                 .start(step2()).on("*").to(step3()).on("*").to(step4())
                 .build().build();
+        return j;
     }
     // Calculation of total count of requests for each asset
     @Bean(name = "step2")
